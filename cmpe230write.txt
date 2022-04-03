@@ -1,0 +1,12 @@
+This is testing for fprintf...
+This is testing for fputs...
+int  x
+ = 0;
+int  y
+ = 0;
+bad choice 
+;
+printf("------------
+") ;
+int f[2][3] = {1,2,3,4,5,6};
+float d[3][1] = {1.0,2,3};

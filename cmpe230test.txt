@@ -1,0 +1,8 @@
+scalar x
+vector d[3]
+scalar y
+matrix f[2,3]
+x = 3 
+printsep()
+f = { 1 2  3 4 5   6 }
+d = {1.0 2 4}
