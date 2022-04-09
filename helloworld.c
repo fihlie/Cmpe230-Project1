@@ -31,6 +31,8 @@ int size1[256];
 int size2[256];
 bool isassigned[256];
 char scalars[256][256];
+bool isscalarfloat[256]; // added
+bool isvarfloat[256];  // added
 int varcount = 0 ;
 int linecount = 0 ;
 int scalarcount = 0 ;
@@ -65,13 +67,13 @@ while (fgets(line, sizeof(line), file)) {
       printf(thisline);
       printf(" thisline \n");
       if ( strcmp("scalar",ptr) == 0 && isscalardef){  // case: scalar definition
-        fputs("int ", fp);
+        fputs("float ", fp);  // changed from int to float
         printf(ptr);
       }
 
       else if(strstr(thisline, "[") && definition ){ // case non-scalar definition
-        addline = false;
         ptr = strtok(NULL, delim);
+        fputs("float " , fp) ;
         if (strstr(thisline, ",")){ // case 2d array definition
 
           printf("comma \n") ;
@@ -110,7 +112,21 @@ while (fgets(line, sizeof(line), file)) {
         
           size1[varcount] = atoi(firstdimension);
           size2[varcount] = atoi(seconddimension);  
+          int numofelements = size1[varcount] * size2[varcount];
+          int zeros;
+          fputs(varname, fp);
+          fputs("[" ,fp);
+          fputs(firstdimension, fp);
+          fputs("][" , fp);
+          fputs(seconddimension,fp);
+          fputs("] = ", fp);
+          fputs("{", fp) ;
+          for (zeros = 0 ; zeros < numofelements -1 ; zeros++  ){
+            fputs(" 0.0 , ", fp);
+          }
+          fputs("0.0 }",fp) ;
           varcount = varcount + 1 ;
+
           break ;
         }
         else {  // case 1d array definition
@@ -134,7 +150,19 @@ while (fgets(line, sizeof(line), file)) {
           size1[varcount] = vectsizeint ;
           size2[varcount] = 1;
         //  fputs(vectorsize,fp);
-          
+          int numofelements = size1[varcount] * size2[varcount];
+          int zeros;
+          fputs(varname, fp);
+          fputs("[ " ,fp);
+          fputs(vectorsize, fp);
+          fputs("][" , fp);
+          fputs("1",fp);
+          fputs( "] = ", fp);
+          fputs("{", fp) ;
+          for (zeros = 0 ; zeros < numofelements -1 ; zeros++  ){
+            fputs(" 0.0 , ", fp);
+          }
+          fputs("0.0 }",fp) ;
           varcount = varcount + 1 ;
           printf("%d ", ptr);
           break;
@@ -144,38 +172,49 @@ while (fgets(line, sizeof(line), file)) {
       else if (assignment){  // case assign vector or matrix
           int i ;
           printf("\n    ---Fine---   \n");
-          if (isfloat){
-            fputs("float " , fp);
-          }
-          else {
-            fputs("int ",fp);
-          }
+            
+
+           
           for(i = 0; i < varcount; ++i)
           {
               if(!strcmp(vars[i], ptr))
               {
+                if(!isfloat) {  // added
+                  isvarfloat[i] == false;  // added
+                } // added
                 printf("\n    ---Fine---   \n");
                 fputs(vars[i],fp);
-                fputs("[",fp);
-                fprintf(fp,"%d",size1[i]);
-                fputs("][",fp);
-                fprintf(fp,"%d",size2[i]);
-                fputs("] = {",fp);
+             
+                fputs(" = {",fp);
 
                 char *e;
                 int index;
                 e = strchr(thisline, '{');
                 index = (int)(e - thisline);
+                char *end;
+                end = strchr(thisline, '}');
+                int endindex ;
+                endindex  = (int)(end-thisline); 
                 char nums[256];
-                strncpy(nums,&thisline[index+1],strlen(thisline) -index -3);
+                strncpy(nums,&thisline[index+1], endindex - index-1 );
+
+                printf(" \n     nums   \n");
+                printf(nums);
+                printf(" \n  nums   \n ") ;
+
                 char *commaptr = strtok(nums,delim);
+
                 int numofelements = size1[i] * size2[i];
                 int elementcounter = 0 ;
+                isassigned[i] = true ; // added
                 while (commaptr != NULL){
                   elementcounter = elementcounter + 1 ;
-                  fputs(commaptr,fp);
                   if (elementcounter<numofelements){
+                    fputs(commaptr,fp);
                     fputs (",",fp);
+                  }
+                  if (elementcounter == numofelements){
+                    fputs(commaptr,fp);
                   }
                   commaptr = strtok(NULL,delim);
                 }
@@ -217,6 +256,7 @@ while (fgets(line, sizeof(line), file)) {
         else {
           if (isscalardef){ // case scalar initialize to 0 
             strncpy(scalars[scalarcount], ptr, strlen(ptr));
+            isscalarfloat[scalarcount] = true ;
             scalarcount = scalarcount + 1 ; 
             fputs(ptr,fp); 
             fputs( " = 0", fp);
