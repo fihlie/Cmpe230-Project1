@@ -3,7 +3,18 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #define _GNU_SOURCE
-
+float choose(float expr1,float expr2,float expr3,float expr4) ;
+float choose(float expr1,float expr2,float expr3,float expr4){
+    if (expr1 == 0) {
+        return expr2 ;
+    }
+    else if (expr1 > 0 ){
+        return expr3 ;
+    }
+    else {
+        return expr4 ;
+    }
+}
 int main(int argc, char* argv[])
 {
 //read any text file from currect directory
@@ -14,6 +25,12 @@ char const* const fileName = "cmpe230test.txt";
    fp = fopen("cmpe230write.txt", "w+");
    fprintf(fp, "This is testing for fprintf...\n");
    fputs("This is testing for fputs...\n", fp);
+   fputs("float choose(float expr1,float expr2,float expr3,float expr4) ; \n" ,fp);
+   fputs("float choose(float expr1,float expr2,float expr3,float expr4) { \n" ,fp);
+   fputs("   if (expr1 == 0) { \n return expr2 ; \n { \n" ,fp);   
+   fputs(" else if (expr1 > 0 ){ \n return expr3 ; \n } \n" ,fp);
+   fputs("else { \n return expr4 ; \n } \n } \n",fp);
+
 FILE* file = fopen(fileName, "r"); 
 
 char delim[] = " ";
@@ -36,7 +53,6 @@ bool isvarfloat[256];  // added
 int varcount = 0 ;
 int linecount = 0 ;
 int scalarcount = 0 ;
-
 while (fgets(line, sizeof(line), file)) {
   line[sizeof(line)-1] = 0;
   char thisline[500]; // string of iterated line, stable
